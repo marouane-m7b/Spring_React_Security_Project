@@ -131,3 +131,7 @@ Les rôles et l’accès à chaque incident sont contrôlés par le backend. Les
 ### Consultation des incidents de l’utilisateur — `200 OK`
 
 ![Capture Postman de la liste des incidents de l’utilisateur](images/postman-mes-incidents-200.png)
+
+### Consultation du détail d’un incident — `200 OK`
+
+![Capture Postman du détail d’un incident](images/postman-detail-incident-200.png)
