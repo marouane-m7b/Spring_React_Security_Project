@@ -85,3 +85,49 @@ Vite affiche l’adresse locale du frontend, normalement `http://localhost:5173`
 ## État actuel
 
 L’initialisation des deux projets, le modèle de données, le diagramme ERD et l’authentification JWT sont en place. Les API métier, les règles d’autorisation par rôle et les écrans fonctionnels du frontend restent à développer.
+
+## API de profil et des incidents
+
+Toutes les routes `/api/**` exigent `Authorization: Bearer <token>`.
+
+| Méthode | URL | Accès |
+|---|---|---|
+| `GET` | `/api/profile` | Utilisateur connecté |
+| `PUT` | `/api/profile` | Utilisateur connecté |
+| `POST` | `/api/incidents` | Utilisateur connecté (créateur = compte connecté) |
+| `GET` | `/api/incidents/my` | Ses incidents créés |
+| `GET` | `/api/incidents/{id}` | Créateur, technicien affecté ou administrateur |
+| `GET` | `/api/incidents/assigned` | Technicien |
+| `PUT` | `/api/incidents/{id}/status` | Technicien affecté à l’incident |
+| `GET` | `/api/incidents` | Administrateur |
+| `PUT` | `/api/incidents/{id}/assign/{technicianId}` | Administrateur |
+
+Création d’incident (`POST /api/incidents`) :
+
+```json
+{
+  "title": "Suspicion de phishing",
+  "description": "Un courriel suspect a été reçu.",
+  "category": "PHISHING",
+  "priority": "HIGH"
+}
+```
+
+Mise à jour du statut (`PUT /api/incidents/{id}/status`) :
+
+```json
+{
+  "status": "IN_PROGRESS",
+  "treatmentNote": "Analyse des en-têtes du courriel en cours."
+}
+```
+
+Les rôles et l’accès à chaque incident sont contrôlés par le backend. Les employés ne peuvent lire que leurs incidents ; les techniciens ne peuvent traiter que les incidents qui leur sont affectés. Les incidents `CLOSED` ne peuvent pas être rouverts par la mise à jour technicien.
+
+### Création réussie d’un incident — `201 Created`
+
+![Capture Postman de la création d’un incident](images/postman-creation-incident-201.png)
+
+### Consultation des incidents de l’utilisateur — `200 OK`
+
+![Capture Postman de la liste des incidents de l’utilisateur](images/postman-mes-incidents-200.png)
