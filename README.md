@@ -143,3 +143,43 @@ Les rôles et l’accès à chaque incident sont contrôlés par le backend. Les
 ### Contrôle de propriété : accès refusé au second employé — `403 Forbidden`
 
 ![Capture Postman du refus d’accès à l’incident d’un autre employé](images/postman-other-employee-forbidden-403.png)
+
+## Administration des utilisateurs et statistiques
+
+Le premier compte administrateur est créé au démarrage uniquement lorsque les deux variables d’environnement `BOOTSTRAP_ADMIN_EMAIL` et `BOOTSTRAP_ADMIN_PASSWORD` sont définies. Il n’est jamais possible de choisir le rôle lors d’une inscription publique. Le mot de passe initial est haché avec BCrypt. Une fois connecté comme administrateur, celui-ci peut attribuer le rôle `TECHNICIAN` ou désactiver un compte.
+
+Exemple PowerShell pour démarrer avec un administrateur initial :
+
+```powershell
+$env:BOOTSTRAP_ADMIN_EMAIL = "admin@example.com"
+$env:BOOTSTRAP_ADMIN_PASSWORD = "ChangeThisAdminPassword!"
+cd backend
+mvn spring-boot:run
+```
+
+| Méthode | URL | Accès |
+|---|---|---|
+| `GET` | `/api/admin/users` | Administrateur |
+| `PUT` | `/api/admin/users/{id}/role` | Administrateur |
+| `PUT` | `/api/admin/users/{id}/enabled` | Administrateur |
+| `GET` | `/api/admin/statistics` | Administrateur |
+
+Exemple pour promouvoir un utilisateur au rôle technicien :
+
+```http
+PUT /api/admin/users/2/role
+Authorization: Bearer <token-administrateur>
+Content-Type: application/json
+```
+
+```json
+{ "role": "TECHNICIAN" }
+```
+
+Exemple d’activation ou désactivation d’un compte :
+
+```json
+{ "enabled": false }
+```
+
+L’administrateur ne peut pas se désactiver lui-même ni retirer son propre rôle. Le tableau de bord des statistiques renvoie le nombre total d’utilisateurs, d’incidents et le nombre d’incidents pour chaque statut.
