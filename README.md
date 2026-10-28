@@ -135,3 +135,11 @@ Les rôles et l’accès à chaque incident sont contrôlés par le backend. Les
 ### Consultation du détail d’un incident — `200 OK`
 
 ![Capture Postman du détail d’un incident](images/postman-detail-incident-200.png)
+
+### Connexion du second employé — `200 OK`
+
+![Capture Postman de la connexion du second employé](images/postman-login-second-employee-200.png)
+
+### Contrôle de propriété : accès refusé au second employé — `403 Forbidden`
+
+![Capture Postman du refus d’accès à l’incident d’un autre employé](images/postman-other-employee-forbidden-403.png)
