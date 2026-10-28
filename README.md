@@ -183,3 +183,7 @@ Exemple d’activation ou désactivation d’un compte :
 ```
 
 L’administrateur ne peut pas se désactiver lui-même ni retirer son propre rôle. Le tableau de bord des statistiques renvoie le nombre total d’utilisateurs, d’incidents et le nombre d’incidents pour chaque statut.
+
+### Statistiques administrateur — `200 OK`
+
+![Capture Postman des statistiques administrateur](images/postman-admin-statistics-200.png)
