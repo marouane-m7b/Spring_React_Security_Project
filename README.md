@@ -191,3 +191,7 @@ L’administrateur ne peut pas se désactiver lui-même ni retirer son propre r�
 ### Résolution d’un incident par le technicien — `200 OK`
 
 ![Capture Postman de la résolution de l’incident par le technicien](images/postman-technician-resolved-200.png)
+
+### L’employé consulte l’incident résolu et son historique — `200 OK`
+
+![Capture Postman de l’incident résolu visible par son créateur](images/postman-employee-sees-resolved-incident-200.png)
