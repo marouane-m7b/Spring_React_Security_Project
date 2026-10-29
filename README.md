@@ -187,3 +187,7 @@ L’administrateur ne peut pas se désactiver lui-même ni retirer son propre r�
 ### Statistiques administrateur — `200 OK`
 
 ![Capture Postman des statistiques administrateur](images/postman-admin-statistics-200.png)
+
+### Résolution d’un incident par le technicien — `200 OK`
+
+![Capture Postman de la résolution de l’incident par le technicien](images/postman-technician-resolved-200.png)
