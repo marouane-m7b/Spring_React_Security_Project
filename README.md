@@ -195,3 +195,32 @@ L’administrateur ne peut pas se désactiver lui-même ni retirer son propre r�
 ### L’employé consulte l’incident résolu et son historique — `200 OK`
 
 ![Capture Postman de l’incident résolu visible par son créateur](images/postman-employee-sees-resolved-incident-200.png)
+
+## Interface React
+
+Le frontend React est connecté à l’API avec Axios. Le jeton JWT est ajouté automatiquement aux requêtes protégées ; une réponse `401` efface la session et redirige vers la connexion. Les écrans sont protégés selon le rôle côté client, tandis que le backend reste responsable de l’autorisation réelle.
+
+Écrans disponibles :
+
+- Connexion et inscription (nouvelle inscription = rôle `EMPLOYEE`).
+- Tableau de bord adapté au rôle.
+- Profil utilisateur.
+- Liste des incidents créés, création d’un signalement et détail avec historique.
+- File des incidents affectés et mise à jour du statut avec note de traitement pour le technicien.
+- Liste complète des incidents, affectation à un technicien, gestion des utilisateurs et statistiques pour l’administrateur.
+
+L’interface doit être ouverte sur `http://localhost:5173` afin de correspondre à l’origine autorisée par le CORS du backend.
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Vérifier la compilation de production :
+
+```powershell
+npm run build
+```
+
+L’URL de l’API peut être remplacée avec la variable Vite `VITE_API_URL` ; par défaut, `http://localhost:8080` est utilisé.
