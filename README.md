@@ -224,3 +224,9 @@ npm run build
 ```
 
 L’URL de l’API peut être remplacée avec la variable Vite `VITE_API_URL` ; par défaut, `http://localhost:8080` est utilisé.
+
+## Captures d’écran de l’interface
+
+### Tableau de bord de l’employé
+
+![Tableau de bord de l’employé avec le résumé de ses incidents](images/interface-dashboard-employe.png)
