@@ -247,3 +247,5 @@ mvn spring-boot:run
 ```
 
 Hibernate met à jour le schéma automatiquement avec `spring.jpa.hibernate.ddl-auto=update`. La base MySQL conserve les utilisateurs et incidents après l’arrêt du backend, contrairement à l’ancienne base H2 en mémoire.
+
+Pour vérifier l’expiration JWT rapidement, démarrer temporairement le backend avec `JWT_EXPIRATION_MS=5000` (5 secondes), obtenir un nouveau jeton, attendre 6 secondes puis appeler une route `/api/**`. Sans cette variable, la durée normale est d’une heure.
