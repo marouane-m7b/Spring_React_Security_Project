@@ -4,7 +4,7 @@ Application full-stack de gestion des incidents de sécurité informatique, réa
 
 ## Projets
 
-- `backend/` — API Spring Boot 3, Java 17, Spring Web, Spring Security, Spring Data JPA, Validation, H2 et JJWT. Port par défaut : `8080`.
+- `backend/` — API Spring Boot 3, Java 17, Spring Web, Spring Security, Spring Data JPA, Validation, MySQL et JJWT. Port par défaut : `8080`.
 - `frontend/` — React, Vite, Axios et React Router. Port de développement : `5173`.
 
 ## Modèle de données
@@ -45,7 +45,7 @@ Une authentification réussie renvoie `token`, `tokenType`, `email`, `fullName`,
 Authorization: Bearer <token>
 ```
 
-Le secret JWT doit être configuré dans la variable d’environnement `JWT_SECRET` avec au moins 32 octets UTF-8 avant tout déploiement. La valeur de secours incluse dans la configuration est réservée au développement local. Pour le moment, `/auth/**` et `/h2-console/**` sont publics ; les routes `/api/**` requièrent un JWT valide.
+Le secret JWT doit être configuré dans la variable d’environnement `JWT_SECRET` avec au moins 32 octets UTF-8 avant tout déploiement. La valeur de secours incluse dans la configuration est réservée au développement local. Les routes `/auth/**` sont publiques ; les routes `/api/**` requièrent un JWT valide.
 
 ## Captures d’écran Postman
 
@@ -230,3 +230,20 @@ L’URL de l’API peut être remplacée avec la variable Vite `VITE_API_URL` ; 
 ### Tableau de bord de l’employé
 
 ![Tableau de bord de l’employé avec le résumé de ses incidents](images/interface-dashboard-employe.png)
+
+
+## Base de données MySQL (Laragon)
+
+Le backend utilise MySQL 8.4. Démarrer MySQL depuis Laragon ; la base `security_incidents` est utilisée par l’application et créée dans Laragon. Les variables `DB_URL`, `DB_USERNAME` et `DB_PASSWORD` permettent de configurer une autre instance ou un compte dédié. En configuration locale, les valeurs par défaut sont `localhost:3306`, `root` et un mot de passe vide.
+
+Exemple de lancement avec un compte MySQL configuré :
+
+```powershell
+$env:DB_URL = "jdbc:mysql://localhost:3306/security_incidents?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
+$env:DB_USERNAME = "security_incidents_app"
+$env:DB_PASSWORD = "votre-mot-de-passe-local"
+cd backend
+mvn spring-boot:run
+```
+
+Hibernate met à jour le schéma automatiquement avec `spring.jpa.hibernate.ddl-auto=update`. La base MySQL conserve les utilisateurs et incidents après l’arrêt du backend, contrairement à l’ancienne base H2 en mémoire.
