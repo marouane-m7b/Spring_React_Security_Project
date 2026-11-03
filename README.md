@@ -144,6 +144,20 @@ Les rôles et l’accès à chaque incident sont contrôlés par le backend. Les
 
 ![Capture Postman du refus d’accès à l’incident d’un autre employé](images/postman-other-employee-forbidden-403.png)
 
+### Deuxième employé : création de son incident — `201 Created`
+
+![Création de l’incident 1 par employee2@example.com](images/postman-employee2-incident-created-201.png)
+
+### Premier employé : création de son incident — `201 Created`
+
+![Création de l’incident 2 par employee1@example.com](images/postman-employee1-incident-created-201.png)
+
+### Isolation des incidents — chaque employé ne voit que le sien — `200 OK`
+
+![employee2@example.com consulte uniquement l’incident 1](images/postman-employee2-my-incidents-200.png)
+
+![employee1@example.com consulte uniquement l’incident 2](images/postman-employee1-my-incidents-200.png)
+
 ## Administration des utilisateurs et statistiques
 
 Le premier compte administrateur est créé au démarrage uniquement lorsque les deux variables d’environnement `BOOTSTRAP_ADMIN_EMAIL` et `BOOTSTRAP_ADMIN_PASSWORD` sont définies. Il n’est jamais possible de choisir le rôle lors d’une inscription publique. Le mot de passe initial est haché avec BCrypt. Une fois connecté comme administrateur, celui-ci peut attribuer le rôle `TECHNICIAN` ou désactiver un compte.
@@ -188,6 +202,30 @@ L’administrateur ne peut pas se désactiver lui-même ni retirer son propre r�
 
 ![Capture Postman des statistiques administrateur](images/postman-admin-statistics-200.png)
 
+### Administrateur : consultation des incidents — `200 OK`
+
+![L’administrateur consulte les deux incidents](images/postman-admin-incidents-200.png)
+
+### Administrateur : consultation des utilisateurs — `200 OK`
+
+![L’administrateur consulte les rôles et identifiants des utilisateurs](images/postman-admin-users-200.png)
+
+### Affectation de l’incident 1 au technicien — `200 OK`
+
+![L’administrateur affecte l’incident 1 au technicien 4](images/postman-admin-assign-incident-1-200.png)
+
+### Consultation des incidents affectés au technicien — `200 OK`
+
+![Le technicien consulte l’incident 1 qui lui est affecté](images/postman-technician-assigned-incidents-200.png)
+
+### Mise en cours de traitement par le technicien — `200 OK`
+
+![Le technicien passe l’incident 1 à IN_PROGRESS avec une note](images/postman-technician-in-progress-200.png)
+
+### Résolution de l’incident 1 par le technicien — `200 OK`
+
+![Le technicien passe l’incident 1 à RESOLVED avec une note de traitement](images/postman-technician-resolved-incident-1-200.png)
+
 ### Résolution d’un incident par le technicien — `200 OK`
 
 ![Capture Postman de la résolution de l’incident par le technicien](images/postman-technician-resolved-200.png)
@@ -195,6 +233,10 @@ L’administrateur ne peut pas se désactiver lui-même ni retirer son propre r�
 ### L’employé consulte l’incident résolu et son historique — `200 OK`
 
 ![Capture Postman de l’incident résolu visible par son créateur](images/postman-employee-sees-resolved-incident-200.png)
+
+### Le créateur consulte le statut résolu et l’historique de l’incident 1 — `200 OK`
+
+![employee2@example.com consulte le statut RESOLVED et les quatre entrées d’historique](images/postman-employee2-incident-history-200.png)
 
 ## Interface React
 
