@@ -291,3 +291,45 @@ mvn spring-boot:run
 Hibernate met à jour le schéma automatiquement avec `spring.jpa.hibernate.ddl-auto=update`. La base MySQL conserve les utilisateurs et incidents après l’arrêt du backend, contrairement à l’ancienne base H2 en mémoire.
 
 Pour vérifier l’expiration JWT rapidement, démarrer temporairement le backend avec `JWT_EXPIRATION_MS=5000` (5 secondes), obtenir un nouveau jeton, attendre 6 secondes puis appeler une route `/api/**`. Sans cette variable, la durée normale est d’une heure.
+
+### Accès sans JWT — `401 Unauthorized`
+
+![Accès à une API protégée sans JWT](images/postman-sans-jwt-401.png)
+
+
+### Accès avec un JWT invalide — `401 Unauthorized`
+
+![Accès refusé avec un JWT invalide](images/postman-jwt-invalide-401.png)
+
+
+### Accès employé à une route administrateur — `403 Forbidden`
+
+![Accès employé refusé à une route administrateur](images/postman-employee-admin-403.png)
+
+
+### Modification d’un incident non affecté par un technicien — `403 Forbidden`
+
+![Modification refusée d’un incident non affecté](images/postman-technician-unassigned-403.png)
+
+
+### Création d’un incident avec des données invalides — `400 Bad Request`
+
+![Création refusée d’un incident invalide](images/postman-incident-invalide-400.png)
+
+
+### Connexion refusée pour un compte désactivé — `401 Unauthorized`
+
+![Désactivation du compte par l’administrateur](images/postman-compte-desactive-200.png)
+
+![Connexion refusée pour le compte désactivé](images/postman-connexion-compte-desactive-401.png)
+
+
+### Accès avec un JWT expiré — `401 Unauthorized`
+
+![Requête refusée avec un JWT expiré](images/postman-token-refuse-401.png)
+
+
+### Inscription avec un email existant — `409 Conflict`
+
+![Inscription refusée pour un email existant](images/postman-email-existant-409.png)
+
