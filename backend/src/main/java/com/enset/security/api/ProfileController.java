@@ -2,11 +2,13 @@ package com.enset.security.api;
 
 import com.enset.security.api.dto.ProfileResponse;
 import com.enset.security.api.dto.UpdateProfileRequest;
+import com.enset.security.api.dto.ChangePasswordRequest;
 import com.enset.security.repository.UserRepository;
 import jakarta.validation.Valid;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,7 +16,20 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/profile")
 public class ProfileController {
     private final UserRepository users;
-    public ProfileController(UserRepository users) { this.users = users; }
+    private final PasswordEncoder passwords;
+    public ProfileController(UserRepository users, PasswordEncoder passwords) { this.users = users; this.passwords = passwords; }
+
+    @PutMapping("/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(Authentication auth, @Valid @RequestBody ChangePasswordRequest request) {
+        var user = users.findByEmail(auth.getName()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (!passwords.matches(request.currentPassword(), user.getPassword()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is incorrect");
+        if (!request.newPassword().equals(request.confirmPassword()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password confirmation does not match");
+        user.setPassword(passwords.encode(request.newPassword()));
+        users.save(user);
+    }
 
     @GetMapping
     public ProfileResponse get(Authentication auth) { return profile(auth.getName()); }
