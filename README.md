@@ -333,3 +333,12 @@ Pour vérifier l’expiration JWT rapidement, démarrer temporairement le backen
 
 ![Inscription refusée pour un email existant](images/postman-email-existant-409.png)
 
+
+### Profil et changement du mot de passe
+
+![Profil et formulaire de changement du mot de passe](images/interface-profil-mot-de-passe.png)
+
+### Tableau de bord employé
+
+![Tableau de bord employé](images/interface-dashboard-employe-actuel.png)
+
