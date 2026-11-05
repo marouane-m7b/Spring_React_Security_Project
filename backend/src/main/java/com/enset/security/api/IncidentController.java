@@ -64,16 +64,17 @@ public class IncidentController {
     @PutMapping("/{id}/status")
     @Transactional
     public IncidentResponse updateStatus(Authentication auth, @PathVariable Long id, @Valid @RequestBody StatusUpdateRequest request) {
-        requireRole(auth, Role.TECHNICIAN);
-        Incident incident = find(id); var technician = currentUser(auth);
-        if (incident.getAssignedTo() == null || !incident.getAssignedTo().getId().equals(technician.getId()))
+        boolean admin = hasRole(auth, Role.ADMIN);
+        if (!admin) requireRole(auth, Role.TECHNICIAN);
+        Incident incident = find(id); var actor = currentUser(auth);
+        if (!admin && (incident.getAssignedTo() == null || !incident.getAssignedTo().getId().equals(actor.getId())))
             throw new AccessDeniedException("Incident is not assigned to you");
         IncidentStatus old = incident.getStatus();
         if (old == IncidentStatus.CLOSED) throw new ResponseStatusException(HttpStatus.CONFLICT, "Closed incidents cannot be reopened through this endpoint");
-        if (request.status() == IncidentStatus.CLOSED) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only an administrator may close an incident");
-        if (!validTransition(old, request.status())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid status transition");
+        if (request.status() == IncidentStatus.CLOSED && !admin) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only an administrator may close an incident");
+        if (!(admin && old == IncidentStatus.RESOLVED && request.status() == IncidentStatus.CLOSED) && !validTransition(old, request.status())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid status transition");
         incident.setStatus(request.status());
-        incident.addHistory(new IncidentHistory(technician, old, request.status(), request.treatmentNote(), "Statut mis à jour"));
+        incident.addHistory(new IncidentHistory(actor, old, request.status(), request.treatmentNote(), "Statut mis à jour"));
         return response(incidents.save(incident));
     }
 

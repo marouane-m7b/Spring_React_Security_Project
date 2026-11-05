@@ -98,7 +98,7 @@ Toutes les routes `/api/**` exigent `Authorization: Bearer <token>`.
 | `GET` | `/api/incidents/my` | Ses incidents créés |
 | `GET` | `/api/incidents/{id}` | Créateur, technicien affecté ou administrateur |
 | `GET` | `/api/incidents/assigned` | Technicien |
-| `PUT` | `/api/incidents/{id}/status` | Technicien affecté à l’incident |
+| `PUT` | `/api/incidents/{id}/status` | Technicien affecté ou administrateur |
 | `GET` | `/api/incidents` | Administrateur |
 | `PUT` | `/api/incidents/{id}/assign/{technicianId}` | Administrateur |
 
@@ -176,6 +176,8 @@ mvn spring-boot:run
 | `GET` | `/api/admin/users` | Administrateur |
 | `PUT` | `/api/admin/users/{id}/role` | Administrateur |
 | `PUT` | `/api/admin/users/{id}/enabled` | Administrateur |
+| `PUT` | `/api/admin/users/{id}/enable` | Administrateur |
+| `PUT` | `/api/admin/users/{id}/disable` | Administrateur |
 | `GET` | `/api/admin/statistics` | Administrateur |
 
 Exemple pour promouvoir un utilisateur au rôle technicien :

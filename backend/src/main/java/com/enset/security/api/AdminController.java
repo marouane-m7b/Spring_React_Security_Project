@@ -55,6 +55,16 @@ public class AdminController {
         return userResponse(users.save(user));
     }
 
+    @PutMapping("/users/{id}/enable")
+    public AdminUserResponse enable(Authentication auth, @PathVariable Long id) {
+        return updateEnabled(auth, id, new UpdateEnabledRequest(true));
+    }
+
+    @PutMapping("/users/{id}/disable")
+    public AdminUserResponse disable(Authentication auth, @PathVariable Long id) {
+        return updateEnabled(auth, id, new UpdateEnabledRequest(false));
+    }
+
     @GetMapping("/statistics")
     public StatisticsResponse statistics(Authentication auth) {
         requireAdmin(auth);
