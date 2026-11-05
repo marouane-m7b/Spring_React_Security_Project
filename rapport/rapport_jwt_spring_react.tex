@@ -1,0 +1,77 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx,xcolor,float,booktabs,fancyhdr,titlesec,array,tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+\definecolor{ensetblue}{RGB}{0,70,140}
+\titleformat{\chapter}[hang]{\bfseries\Huge\color{ensetblue}}{\thechapter.}{15pt}{}
+\titlespacing*{\chapter}{0pt}{-20pt}{25pt}
+\titleformat{\section}{\bfseries\Large\color{ensetblue}}{\thesection}{10pt}{}
+\pagestyle{fancy}\fancyhf{}\lhead{\small Sécurité des systèmes distribués}\rhead{\small Master SDIA -- ENSET Mohammedia}\cfoot{\thepage}\setlength{\headheight}{15pt}
+\newcommand{\capture}[2]{\begin{figure}[H]\centering\includegraphics[width=\textwidth,height=.63\textheight,keepaspectratio]{../images/#1}\caption{#2}\end{figure}}
+\begin{document}
+\begin{titlepage}\centering
+\includegraphics[width=.42\textwidth]{enset.png}\\[1cm]
+{\Large\bfseries Master SDIA\par}{\large ENSET Mohammedia\par}\vspace{1.4cm}
+\rule{\textwidth}{1.5pt}\\[.5cm]
+{\Huge\bfseries\color{ensetblue} Rapport de projet\par}\vspace{.4cm}
+{\LARGE\bfseries Gestion des incidents de sécurité\\[.3cm] Spring Security, JWT et React\par}
+\rule{\textwidth}{1.5pt}\\[1cm]
+{\large Module : \textbf{Sécurité des systèmes distribués}\par}\vspace{2cm}
+\begin{flushleft}\large\textbf{Réalisé par :} \hfill \textbf{Encadré par :}\\[.2cm] Mahboub Marouane \hfill M. Abdelmajid BOUSSELHAM\end{flushleft}
+\vfill{\large \today}\end{titlepage}
+\tableofcontents\listoffigures\clearpage
+\chapter{Introduction}
+Ce projet réalise une application de déclaration et de suivi des incidents informatiques. Il met en œuvre une API Spring Boot protégée par Spring Security et JWT, ainsi qu'une interface React. Le contrôle d'accès aux données est effectué côté serveur selon le rôle et les liens entre les utilisateurs et les incidents.
+\section{Objectifs}
+\begin{itemize}\item Authentifier les utilisateurs et protéger les accès avec un jeton JWT à durée limitée.\item Séparer les droits des employés, techniciens et administrateurs.\item Conserver les affectations, changements de statut et notes de traitement.\item Fournir des tableaux de bord et vérifier les règles de sécurité avec Postman.\end{itemize}
+\chapter{Architecture et modèle de données}
+\section{Architecture générale}
+L'interface React communique en HTTP et JSON avec l'API Spring Boot. Après authentification, Axios transmet le jeton dans l'en-tête \texttt{Authorization: Bearer}. Le filtre JWT et Spring Security vérifient la requête avant son traitement. Les données sont stockées dans MySQL.
+\begin{figure}[H]\centering\begin{tikzpicture}[node distance=1.1cm,box/.style={draw=ensetblue,rounded corners,align=center,minimum width=7cm,minimum height=1cm},>=Stealth]
+\node[box] (react) {React -- pages, routes protégées, Axios};
+\node[box,below=of react] (sec) {Spring Security -- filtre JWT};
+\node[box,below=of sec] (api) {Contrôleurs REST -- validation -- JPA};
+\node[box,below=of api] (db) {MySQL -- utilisateurs, incidents, historique};
+\draw[->] (react)--node[right]{HTTP / JSON + JWT}(sec);\draw[->](sec)--(api);\draw[->](api)--(db);
+\end{tikzpicture}\caption{Architecture générale de l'application}\end{figure}
+\section{Entités et relations}
+L'entité \texttt{User} contient l'identité, l'email unique, le mot de passe haché, le rôle et l'état du compte. \texttt{Incident} contient le titre, la description, la catégorie, la priorité, le statut et les dates. Chaque incident possède un créateur et peut être affecté à un technicien. \texttt{IncidentHistory} conserve l'auteur, les états et une éventuelle note.
+\begin{figure}[H]\centering\begin{tikzpicture}[node distance=1.5cm,box/.style={draw=ensetblue,rounded corners,align=left,text width=4cm,minimum height=2cm},>=Stealth]
+\node[box] (user) {\textbf{USER}\\ id, fullName, email\\ password, role, enabled};
+\node[box,right=of user] (incident) {\textbf{INCIDENT}\\ id, title, status\\ createdBy, assignedTo};
+\node[box,below=of incident] (history) {\textbf{INCIDENT HISTORY}\\ id, oldStatus, newStatus\\ treatmentNote, changedBy};
+\draw[->] (incident)--node[above]{créateur / technicien}(user);\draw[->](history)--node[right]{incident}(incident);\draw[->](history)--node[below left]{auteur}(user);
+\end{tikzpicture}\caption{Relations principales entre les entités}\end{figure}
+Les associations vers le créateur et le technicien sont des \texttt{@ManyToOne} chargées en mode \texttt{LAZY}. Les réponses DTO sélectionnent les données utiles et évitent la sérialisation récursive. Le diagramme détaillé est également disponible dans \texttt{docs/erd.md}.
+\chapter{Authentification et autorisation}
+\section{Authentification}
+L'inscription publique crée un compte \texttt{EMPLOYEE}; le rôle ne peut pas être choisi lors de cette opération. Le mot de passe est haché avec BCrypt. La connexion renvoie un JWT signé contenant l'email, le rôle, la date d'émission et la date d'expiration. L'API utilise une politique de session \texttt{STATELESS} et autorise le frontend local par CORS.
+\section{Rôles et protection}
+L'employé crée et consulte ses incidents. Le technicien consulte les incidents qui lui sont affectés et peut en modifier le statut avec une note. L'administrateur gère les comptes, consulte l'ensemble des incidents et les affecte. La propriété et l'affectation sont contrôlées par le backend. Les incidents fermés ne peuvent pas être modifiés par la mise à jour ordinaire.
+\section{Profil et expiration}
+Le profil permet de modifier le nom et l'email. Le changement de mot de passe exige l'ancien mot de passe et la confirmation du nouveau; le serveur vérifie l'ancien avant l'enregistrement. Une réponse \texttt{401} sur une requête protégée déclenche la suppression de la session côté React et la redirection vers la connexion.
+\capture{interface-profil-mot-de-passe.png}{Profil utilisateur et changement du mot de passe}
+\chapter{Fonctionnalités et interfaces}
+\section{Suivi des incidents}
+Un incident commence en état \texttt{OPEN}. L'affectation peut le faire passer à \texttt{ASSIGNED}, puis le traitement à \texttt{IN\_PROGRESS} et \texttt{RESOLVED}. Un administrateur peut fermer un incident résolu. L'historique garde la trace des actions et des notes.
+\capture{postman-employee2-incident-history-200.png}{Historique consulté par le créateur de l'incident}
+\section{Tableaux de bord}
+Les tableaux de bord présentent les indicateurs et incidents accessibles à chaque rôle : incidents personnels pour l'employé, incidents affectés et critiques pour le technicien, et statistiques globales pour l'administrateur.
+\capture{interface-dashboard-employe-actuel.png}{Tableau de bord de l'employé}
+\capture{interface-dashboard-technicien.png}{Tableau de bord du technicien}
+\capture{interface-dashboard-administrateur.png}{Tableau de bord de l'administrateur}
+\chapter{Vérifications et résultats}
+Les captures Postman du dépôt documentent le scénario de création, d'affectation, de traitement et de consultation de l'historique. Les neuf cas de sécurité demandés ont été exercés :
+\begin{enumerate}\item Requête sans JWT : \texttt{401}.\item JWT invalide : \texttt{401}.\item JWT expiré : \texttt{401} (jeton ancien de plus de trois heures, durée configurée d'une heure).\item Employé sur une route administrateur : \texttt{403}.\item Employé sur l'incident d'un autre : \texttt{403}.\item Technicien sur un incident non affecté : \texttt{403}.\item Connexion à un compte désactivé : \texttt{401}.\item Inscription avec un email existant : \texttt{409}.\item Incident avec données invalides : \texttt{400}.\end{enumerate}
+\capture{postman-other-employee-forbidden-403.png}{Refus d'accès à l'incident d'un autre employé}
+\capture{postman-technician-unassigned-403.png}{Refus de modification par un technicien non affecté}
+\capture{postman-incident-invalide-400.png}{Validation des données lors de la création d'un incident}
+Les neuf captures se trouvent dans le README. Le scénario documenté utilise deux employés et un incident par employé ; pour la démonstration conforme à l'énoncé, le premier employé doit créer un second incident.
+\chapter{Conclusion}
+L'application associe authentification JWT, contrôle des rôles et vérification de l'accès à chaque incident. Les historiques, notes et tableaux de bord assurent le suivi. La démonstration finale doit être effectuée avec les services MySQL, Spring Boot et React démarrés. Le renouvellement par refresh token, facultatif dans l'énoncé, n'est pas implémenté.
+\end{document}

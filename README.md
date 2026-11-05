@@ -84,7 +84,7 @@ Vite affiche l’adresse locale du frontend, normalement `http://localhost:5173`
 
 ## État actuel
 
-L’initialisation des deux projets, le modèle de données, le diagramme ERD et l’authentification JWT sont en place. Les API métier, les règles d’autorisation par rôle et les écrans fonctionnels du frontend restent à développer.
+Le backend, le frontend, les tableaux de bord, le changement de mot de passe et les contrôles d’accès sont implémentés. Les captures des neuf tests de sécurité figurent ci-dessous. Le refresh token est facultatif et non implémenté.
 
 ## API de profil et des incidents
 
@@ -94,6 +94,7 @@ Toutes les routes `/api/**` exigent `Authorization: Bearer <token>`.
 |---|---|---|
 | `GET` | `/api/profile` | Utilisateur connecté |
 | `PUT` | `/api/profile` | Utilisateur connecté |
+| `PUT` | `/api/profile/password` | Changement du mot de passe |
 | `POST` | `/api/incidents` | Utilisateur connecté (créateur = compte connecté) |
 | `GET` | `/api/incidents/my` | Ses incidents créés |
 | `GET` | `/api/incidents/{id}` | Créateur, technicien affecté ou administrateur |
@@ -354,3 +355,20 @@ Pour vérifier l’expiration JWT rapidement, démarrer temporairement le backen
 
 ![Tableau de bord de l’administrateur](images/interface-dashboard-administrateur.png)
 
+
+## Comptes locaux de démonstration
+
+Ces comptes correspondent aux données locales de démonstration ; ils ne sont pas créés automatiquement dans une nouvelle base. L’administrateur initial peut être créé avec les variables `BOOTSTRAP_ADMIN_EMAIL` et `BOOTSTRAP_ADMIN_PASSWORD` décrites ci-dessus.
+
+| Rôle | Adresse | Mot de passe local |
+|---|---|---|
+| Administrateur | `admin@example.com` | `AdminDemo123!` |
+| Employé 1 | `employee1@example.com` | `Employee123!` |
+| Employé 2 | `employee2@example.com` | `Employee123!` |
+| Technicien | `tech1@example.com` | `Technician123!` |
+
+## Rapport et livrables
+
+Le [rapport PDF](rapport/rapport_jwt_spring_react.pdf), son [code LaTeX](rapport/rapport_jwt_spring_react.tex), le [diagramme des entités](docs/erd.md), le diagramme d’architecture dans le rapport et les captures dans `images/` accompagnent les deux projets. Pour compiler le rapport depuis `rapport/`, exécuter deux fois `pdflatex -interaction=nonstopmode rapport_jwt_spring_react.tex`.
+
+Pour la démonstration, démarrer MySQL, le backend et le frontend. L’employé 1 doit créer deux incidents, puis l’employé 2 un incident. Vérifier l’isolation, affecter un incident en tant qu’administrateur, le traiter avec le technicien et consulter son historique en tant que créateur. Les captures existantes montrent un incident créé par chaque employé ; le deuxième incident du premier employé reste à créer pour reproduire exactement ce scénario.
