@@ -342,3 +342,13 @@ Pour vérifier l’expiration JWT rapidement, démarrer temporairement le backen
 
 ![Tableau de bord employé](images/interface-dashboard-employe-actuel.png)
 
+
+### Tableau de bord technicien
+
+![Tableau de bord du technicien](images/interface-dashboard-technicien.png)
+
+
+### Tableau de bord administrateur
+
+![Tableau de bord de l’administrateur](images/interface-dashboard-administrateur.png)
+
