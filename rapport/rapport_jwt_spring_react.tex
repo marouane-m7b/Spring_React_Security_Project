@@ -13,6 +13,7 @@
 \titleformat{\section}{\bfseries\Large\color{ensetblue}}{\thesection}{10pt}{}
 \pagestyle{fancy}\fancyhf{}\lhead{\small Sécurité des systèmes distribués}\rhead{\small Master SDIA -- ENSET Mohammedia}\cfoot{\thepage}\setlength{\headheight}{15pt}
 \newcommand{\capture}[2]{\begin{figure}[H]\centering\includegraphics[width=\textwidth,height=.63\textheight,keepaspectratio]{../images/#1}\caption{#2}\end{figure}}
+\setlength{\emergencystretch}{3em}
 \begin{document}
 \begin{titlepage}\centering
 \includegraphics[width=.42\textwidth]{enset.png}\\[1cm]
@@ -71,7 +72,86 @@ Les captures Postman du dépôt documentent le scénario de création, d'affecta
 \capture{postman-other-employee-forbidden-403.png}{Refus d'accès à l'incident d'un autre employé}
 \capture{postman-technician-unassigned-403.png}{Refus de modification par un technicien non affecté}
 \capture{postman-incident-invalide-400.png}{Validation des données lors de la création d'un incident}
-Les neuf captures se trouvent dans le README. Le scénario documenté utilise deux employés et un incident par employé ; pour la démonstration conforme à l'énoncé, le premier employé doit créer un second incident.
+Les captures détaillées figurent également en annexe et dans le README. Le scénario documenté utilise deux employés et un incident par employé ; pour la démonstration conforme à l'énoncé, le premier employé doit créer un second incident.
+
+\chapter{Mise en place et utilisation}
+\section{Environnement technique}
+Le backend utilise Java 17 ou supérieur, Spring Boot, Spring Web, Spring Security, Spring Data JPA, Bean Validation et le pilote MySQL. Le frontend utilise React, Vite, React Router et Axios. MySQL 8.4 est démarré avec Laragon sur le port 3306. Le backend écoute sur le port 8080 et Vite sur le port 5173.
+\section{Démarrage}
+Créer la base \texttt{security\_incidents}, démarrer MySQL, puis lancer \texttt{mvn spring-boot:run} dans \texttt{backend/}. Dans un second terminal, exécuter \texttt{npm install} puis \texttt{npm run dev} dans \texttt{frontend/}. Les variables \texttt{DB\_URL}, \texttt{DB\_USERNAME} et \texttt{DB\_PASSWORD} permettent d'adapter la connexion. Le secret JWT peut être fourni par \texttt{JWT\_SECRET}. Un premier administrateur peut être créé à l'aide des variables \texttt{BOOTSTRAP\_ADMIN\_EMAIL} et \texttt{BOOTSTRAP\_ADMIN\_PASSWORD}.
+\section{Comptes locaux}
+Les comptes ci-dessous sont ceux employés pour la démonstration locale ; ils ne sont pas créés automatiquement dans une nouvelle base. Les mots de passe correspondent aux données de démonstration utilisées lors des essais.
+\begin{center}\small\begin{tabular}{lll}\toprule Rôle & Email & Mot de passe\\\midrule Administrateur & admin@example.com & AdminDemo123!\\ Employé 1 & employee1@example.com & Employee123!\\ Employé 2 & employee2@example.com & Employee123!\\ Technicien & tech1@example.com & Technician123!\\\bottomrule\end{tabular}\end{center}
+\section{API REST}
+Les routes publiques sont \texttt{POST /auth/register} et \texttt{POST /auth/login}. Les routes suivantes exigent un JWT valide :
+\begin{itemize}
+\item \texttt{GET /api/profile}, \texttt{PUT /api/profile} et \texttt{PUT /api/profile/password} : consultation et mise à jour du profil et du mot de passe.
+\item \texttt{POST /api/incidents}, \texttt{GET /api/incidents/my} et \texttt{GET /api/incidents/\{id\}} : déclaration, liste personnelle et détail sous contrôle d'accès.
+\item \texttt{GET /api/incidents/assigned} et \texttt{PUT /api/incidents/\{id\}/status} : liste affectée et traitement par le technicien ; l'administrateur peut aussi changer le statut.
+\item \texttt{GET /api/incidents} et \texttt{PUT /api/incidents/\{id\}/assign/\{technicianId\}} : liste globale et affectation par l'administrateur.
+\item \texttt{GET /api/admin/users}, \texttt{PUT /api/admin/users/\{id\}/role}, \texttt{/enabled}, \texttt{/enable}, \texttt{/disable} et \texttt{GET /api/admin/statistics} : administration des comptes et statistiques.
+\end{itemize}
+\section{Validation et erreurs}
+Les requêtes sont validées avec \texttt{@Valid}, \texttt{@NotBlank}, \texttt{@Email} et \texttt{@Size}. Une donnée invalide entraîne une réponse 400 ; une authentification absente ou invalide, 401 ; un accès interdit, 403 ; une ressource introuvable, 404 ; et un email déjà utilisé, 409. Le changement de mot de passe rejette l'ancien mot de passe incorrect et une confirmation différente.
+\section{Démonstration}
+Le scénario demandé commence avec deux employés et un technicien. Le premier employé déclare deux incidents et le second en déclare un. Il faut vérifier que le premier ne peut pas lire l'incident du second, puis utiliser le compte administrateur pour consulter et affecter les incidents. Le technicien consulte sa liste, passe un incident en cours puis résolu, et ajoute une note. Le créateur consulte enfin le statut et l'historique. Les captures existantes documentent un incident pour chaque employé : le deuxième incident du premier employé est à créer avant la démonstration complète.
+\chapter{Annexe : captures détaillées des essais}
+Les figures suivantes rassemblent les captures du README et complètent les explications des chapitres précédents. Les réponses et les dates indiquées correspondent aux essais effectués localement. Les jetons affichés dans certaines captures sont ceux des sessions de test.
+
+\capture{postman-inscription-201.png}{Capture Postman de l’inscription réussie}
+
+\capture{postman-connexion-200.png}{Capture Postman de la connexion réussie}
+
+\capture{postman-creation-incident-201.png}{Capture Postman de la création d’un incident}
+
+\capture{postman-mes-incidents-200.png}{Capture Postman de la liste des incidents de l’utilisateur}
+
+\capture{postman-detail-incident-200.png}{Capture Postman du détail d’un incident}
+
+\capture{postman-login-second-employee-200.png}{Capture Postman de la connexion du second employé}
+
+\capture{postman-employee2-incident-created-201.png}{Création de l’incident 1 par employee2@example.com}
+
+\capture{postman-employee1-incident-created-201.png}{Création de l’incident 2 par employee1@example.com}
+
+\capture{postman-employee2-my-incidents-200.png}{employee2@example.com consulte uniquement l’incident 1}
+
+\capture{postman-employee1-my-incidents-200.png}{employee1@example.com consulte uniquement l’incident 2}
+
+\capture{postman-admin-statistics-200.png}{Capture Postman des statistiques administrateur}
+
+\capture{postman-admin-incidents-200.png}{L’administrateur consulte les deux incidents}
+
+\capture{postman-admin-users-200.png}{L’administrateur consulte les rôles et identifiants des utilisateurs}
+
+\capture{postman-admin-assign-incident-1-200.png}{L’administrateur affecte l’incident 1 au technicien 4}
+
+\capture{postman-technician-assigned-incidents-200.png}{Le technicien consulte l’incident 1 qui lui est affecté}
+
+\capture{postman-technician-in-progress-200.png}{Le technicien passe l’incident 1 à IN\_PROGRESS avec une note}
+
+\capture{postman-technician-resolved-incident-1-200.png}{Le technicien passe l’incident 1 à RESOLVED avec une note de traitement}
+
+\capture{postman-technician-resolved-200.png}{Capture Postman de la résolution de l’incident par le technicien}
+
+\capture{postman-employee-sees-resolved-incident-200.png}{Capture Postman de l’incident résolu visible par son créateur}
+
+\capture{interface-dashboard-employe.png}{Tableau de bord de l’employé avec le résumé de ses incidents}
+
+\capture{postman-sans-jwt-401.png}{Accès à une API protégée sans JWT}
+
+\capture{postman-jwt-invalide-401.png}{Accès refusé avec un JWT invalide}
+
+\capture{postman-employee-admin-403.png}{Accès employé refusé à une route administrateur}
+
+\capture{postman-compte-desactive-200.png}{Désactivation du compte par l’administrateur}
+
+\capture{postman-connexion-compte-desactive-401.png}{Connexion refusée pour le compte désactivé}
+
+\capture{postman-token-refuse-401.png}{Requête refusée avec un JWT expiré}
+
+\capture{postman-email-existant-409.png}{Inscription refusée pour un email existant}
+
 \chapter{Conclusion}
 L'application associe authentification JWT, contrôle des rôles et vérification de l'accès à chaque incident. Les historiques, notes et tableaux de bord assurent le suivi. La démonstration finale doit être effectuée avec les services MySQL, Spring Boot et React démarrés. Le renouvellement par refresh token, facultatif dans l'énoncé, n'est pas implémenté.
 \end{document}
